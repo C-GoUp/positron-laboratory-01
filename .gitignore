@@ -1,0 +1,27 @@
+
+# Python environments
+.venv/
+venv/
+
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+
+# Quarto intermediate files
+.quarto/
+*_cache/
+*.knit.md
+
+# macOS
+.DS_Store
+
+# Local editor settings
+.vscode/

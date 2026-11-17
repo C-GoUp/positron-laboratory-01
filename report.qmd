@@ -1,0 +1,188 @@
+
+---
+title: "Positron Laboratory 01"
+subtitle: "R and Python Statistical Validation"
+date: "2026-11-06"
+format:
+  html:
+    toc: true
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Executive Summary
+
+This laboratory investigates the relationship between vehicle
+weight and fuel efficiency using the mtcars dataset.
+
+R and Python independently estimated the same linear regression
+model. Their previously observed results agreed within a
+numerical tolerance of 0.0001.
+
+# Research Question
+
+How is vehicle weight associated with miles per gallon?
+
+# Dataset
+
+```{r}
+library(ggplot2)
+
+dataset <- read.csv("mtcars.csv")
+
+stopifnot(
+  nrow(dataset) == 32,
+  all(c("mpg", "wt") %in% names(dataset))
+)
+
+head(dataset)
+```
+
+# Statistical Analysis
+
+The model is:
+
+$$
+MPG_i = \beta_0 + \beta_1 Weight_i + \epsilon_i
+$$
+
+```{r}
+model <- lm(mpg ~ wt, data = dataset)
+summary(model)
+
+print(coef(summary(model)))
+```
+
+# Visualization
+
+```{r}
+ggplot(dataset, aes(x = wt, y = mpg)) +
+  geom_point(color = "steelblue", size = 3) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Vehicle Weight and Fuel Efficiency",
+    x = "Weight (1,000 lbs)",
+    y = "Miles per Gallon"
+  ) +
+  theme_minimal()
+```
+
+
+## Cross-Language Validation
+
+R and Python independently estimated the same ordinary
+least squares regression model using the same 32 observations.
+
+The R reference values were exported at full numerical
+precision to `r_reference.csv`.
+
+The Python implementation independently calculated the
+intercept, slope, and R-squared. The earlier full-precision
+comparison passed for all three metrics.
+
+```{r}
+# Load the full-precision R reference
+reference <- read.csv("r_reference.csv")
+
+# Confirm the expected metrics exist
+stopifnot(
+  identical(
+    reference$metric,
+    c("intercept", "slope", "r_squared")
+  ),
+  all(is.finite(reference$value))
+)
+
+# Display the full-precision R results
+print(reference, digits = 17)
+```
+
+The independently executed Python validation reported:
+
+- Intercept difference: approximately 2.13e-14
+- Slope difference: approximately 8.88e-16
+- R-squared difference: approximately 1.11e-16
+
+All three comparisons passed.
+
+These results demonstrate numerical agreement between
+the independently implemented R and Python regression
+calculations.
+
+The Python comparison was completed separately and
+is not rerun during this Quarto render.
+
+
+### Automated Regression Testing
+
+The Python regression implementation was evaluated
+using pytest within the project's dedicated virtual
+environment.
+
+The automated test suite contains seven tests:
+
+1. Dataset observation count
+2. Required R reference metrics
+3. Intercept agreement
+4. Weight coefficient agreement
+5. R-squared agreement
+6. Negative weight coefficient
+7. Valid R-squared range
+
+The cross-language comparisons use an absolute
+numerical tolerance of 1e-10.
+
+#### Recorded Test Results
+
+- Test framework: pytest 9.2.0
+- Python numerical library: NumPy 2.2.6
+- Tests executed: 7
+- Tests passed: 7
+- Tests failed: 0
+- Execution time: 0.03 seconds
+
+All seven tests passed during the previously
+completed laboratory execution.
+
+These results represent a recorded test execution.
+The pytest suite is not automatically rerun when
+this Quarto document is rendered.
+
+#### Reproduction Command
+
+From the Positron-Lab-01 project directory:
+
+```bash
+.venv/bin/python -m pytest tests/test_regression.py -v
+```
+
+The Python dependencies are recorded in
+`requirements.txt`.
+
+
+
+# Interpretation
+
+The regression indicates a negative association between
+vehicle weight and fuel efficiency.
+
+The model explains approximately 75.28% of the observed
+variation in miles per gallon.
+
+This observational relationship does not establish causality.
+
+# Reproducibility
+
+```{r}
+sessionInfo()
+```
+
+# Conclusion
+
+The laboratory successfully demonstrated statistical
+modeling in R and independent numerical validation in Python.
+
+Future work will improve full-precision comparisons,
+dependency management, and automated testing.
